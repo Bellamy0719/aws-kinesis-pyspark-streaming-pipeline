@@ -4,9 +4,8 @@
 > [aws-pyspark-data-lakehouse-pipeline](https://github.com/Bellamy0719/aws-pyspark-data-lakehouse-pipeline)
 
 
-
-```
 **Real-Time Stock Data Streaming Architecture**
+```
 
 ┌───────────────────────────┐
 │ S3 Historical Data (2024) │
