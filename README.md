@@ -61,10 +61,10 @@ Dashboard visualization in QuickSight
 | Visualization   | QuickSight + Databricks display() | Real-time dashboards           |
 
 ### Components
-### Step. 1 Producer (Producer - Python → Kinesis)
+### Step 1. Producer (Producer - Python → Kinesis)
 Purpose:
 Simulates real-time stock streaming by reading 2024 Parquet data from S3 and pushing it as JSON messages into AWS Kinesis Stream.
-Located in: [notebooks/producer_kinesis.py](notebooks/databricks_streaming_producer.ipynb)
+Located in: [notebooks/databricks_streaming_producer.ipynb](notebooks/databricks_streaming_producer.ipynb)
 ```
 # Simulate real-time data feed
 kinesis.put_record(
@@ -74,14 +74,14 @@ kinesis.put_record(
 )
 ```
 Summary:
-Starts the entire pipeline to transforms historical S3 data into a continuous live stream.
+Starts the entire pipeline to transform historical S3 data into a continuous live stream.
 
-### Step. 2 Consumer — Databricks Structured Streaming
+### Step 2. Consumer — Databricks Structured Streaming
 Purpose:
 Reads data from Kinesis in real time, parses JSON records, converts timestamps, and computes key metrics:
 1. Latest Close Price
 2. 1-min Rolling Average
-Located in: [notebooks/consumer_kinesis.py](notebooks/databricks_streaming_consumer.ipynb)
+Located in: [notebooks/databricks_streaming_consumer.ipynb](notebooks/databricks_streaming_consumer.ipynb)
 ```
 raw_stream_df = (
     spark.readStream
@@ -94,22 +94,22 @@ raw_stream_df = (
 Summary:
 Acts as the real-time processing engine to continuously consumes the Kinesis stream and performs live transformations.
 
-### Step. 3 Display — Real-Time Visualization in Databricks
+### Step 3. Display — Real-Time Visualization in Databricks
 Purpose:
 Provides live dashboards of streaming data using the built-in display() function, allowing real-time monitoring of:
 
 1. Latest close price per ticker (latest_close_df)
 
-![notebooks/consumer_kinesis.py](notebooks/databrick_consumer_lastest_close.png)
+![notebooks/databrick_consumer_lastest_close.png](notebooks/databrick_consumer_lastest_close.png)
 
 2. 1-minute rolling average trend (avg_1min_df)
  
-![notebooks/consumer_kinesis.py](notebooks/databrick_consumer_avg_1min.png)
+![notebooks/databrick_consumer_avg_1min.png](notebooks/databrick_consumer_avg_1min.png)
 
 Summary:
 Real-time visualization directly inside Databricks to confirm the streaming job is active and data is updating continuously.
 
-### Step. 4 Streaming Sink — Write to AWS S3 (Parquet + Checkpoints)
+### Step 4. Streaming Sink — Write to AWS S3 (Parquet + Checkpoints)
 Purpose:
 Writes processed streaming results to S3 in Parquet format, partitioned by ticker and trade_date,
 with checkpointing for exactly-once recovery.
@@ -128,13 +128,39 @@ with checkpointing for exactly-once recovery.
 )
 
 ```
-![notebooks/consumer_kinesis.py](databrick_consumer_writeto_s3.png)
+![notebooks/databrick_consumer_writeto_s3.png](notebooks/databrick_consumer_writeto_s3.png)
 Summary:
 Streams results to AWS S3 for downstream analytics for fault-tolerant and partitioned for Athena/QuickSight queries.
 
+### Step 5. Analytics Layer — Athena + QuickSight
+Purpose:
+Queries and visualizes the aggregated results stored in S3.
+Provides both tabular and trend-based analytics (e.g., 1-min average price).
+
+```
+SELECT *
+FROM stock_streaming_database.avg_1min
+ORDER BY window_end DESC
+LIMIT 10;
+
+```
+Athena Query Result
+![assets/athena_query_result.png](assets/athena_query_result.png)
+
+QuickSight Dashboard
+![assets/quicksight_dashboard.png](assets/quicksight_dashboard.png)
+Summary:
+Final presentation layer to enable SQL-based exploration and rich visual dashboards.
 
 
-
+### Summary
+| Step | Component       | Description                                                 |
+| ---- | --------------- | ----------------------------------------------------------- |
+| 1️⃣  | Producer        | Sends historical data → Kinesis (simulated real-time feed)  |
+| 2️⃣  | Consumer        | Reads & processes stream in Databricks Structured Streaming |
+| 3️⃣  | Display         | Visualizes live metrics directly in Databricks              |
+| 4️⃣  | Streaming Sink  | Writes processed data to S3 (Parquet + checkpoints)         |
+| 5️⃣  | Analytics Layer | Queries results via Athena, visualizes in QuickSight        |
 
 
 ```
