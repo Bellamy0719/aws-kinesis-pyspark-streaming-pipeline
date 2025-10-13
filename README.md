@@ -50,6 +50,7 @@ Dashboard visualization in QuickSight
    (SQL query + 1-min rolling average)          --- Visualize 1-min rolling averages using charts
 ```
 
+
 ### Tech Stack 
 
 | Layer           | Technology                        | Description                    |
@@ -60,13 +61,14 @@ Dashboard visualization in QuickSight
 | Catalog & Query | AWS Glue + Athena                 | Schema discovery + SQL queries |
 | Visualization   | QuickSight + Databricks display() | Real-time dashboards           |
 
+
+
 ### Components
 ### Step 1. Producer (Producer - Python → Kinesis)
 Purpose:
 Simulates real-time stock streaming by reading 2024 Parquet data from S3 and pushing it as JSON messages into AWS Kinesis Stream.
 Located in: [notebooks/databricks_streaming_producer.ipynb](notebooks/databricks_streaming_producer.ipynb)
 ```
-# Simulate real-time data feed
 kinesis.put_record(
     StreamName="stock_stream",
     Data=json.dumps(record),
@@ -75,6 +77,7 @@ kinesis.put_record(
 ```
 Summary:
 Starts the entire pipeline to transform historical S3 data into a continuous live stream.
+
 
 ### Step 2. Consumer — Databricks Structured Streaming
 Purpose:
@@ -94,6 +97,7 @@ raw_stream_df = (
 Summary:
 Acts as the real-time processing engine to continuously consumes the Kinesis stream and performs live transformations.
 
+
 ### Step 3. Display — Real-Time Visualization in Databricks
 Purpose:
 Provides live dashboards of streaming data using the built-in display() function, allowing real-time monitoring of:
@@ -108,6 +112,7 @@ Provides live dashboards of streaming data using the built-in display() function
 
 Summary:
 Real-time visualization directly inside Databricks to confirm the streaming job is active and data is updating continuously.
+
 
 ### Step 4. Streaming Sink — Write to AWS S3 (Parquet + Checkpoints)
 Purpose:
@@ -126,11 +131,11 @@ with checkpointing for exactly-once recovery.
         .trigger(processingTime="1 minute")
         .start()
 )
-
 ```
 ![notebooks/databrick_consumer_writeto_s3.png](notebooks/databrick_consumer_writeto_s3.png)
 Summary:
 Streams results to AWS S3 for downstream analytics for fault-tolerant and partitioned for Athena/QuickSight queries.
+
 
 ### Step 5. Analytics Layer — Athena + QuickSight
 Purpose:
@@ -142,7 +147,6 @@ SELECT *
 FROM stock_streaming_database.avg_1min
 ORDER BY window_end DESC
 LIMIT 10;
-
 ```
 Athena Query Result
 ![assets/athena_query_result.png](assets/athena_query_result.png)
@@ -162,7 +166,18 @@ Final presentation layer to enable SQL-based exploration and rich visual dashboa
 | 4️⃣  | Streaming Sink  | Writes processed data to S3 (Parquet + checkpoints)         |
 | 5️⃣  | Analytics Layer | Queries results via Athena, visualizes in QuickSight        |
 
+### Why These Tools
+AWS Kinesis — provides a fully managed, scalable real-time data stream, perfect for simulating live stock market data.
 
+Databricks Structured Streaming (PySpark) — allows unified batch + stream processing with fault tolerance and checkpointing.
+
+AWS S3 — serves as a central, durable data lake for storing both raw and aggregated results.
+
+AWS Glue + Athena — automate schema discovery and enable serverless SQL querying on streaming outputs.
+
+AWS QuickSight — provides lightweight, cloud-native visualization for dashboards and real-time analytics.
+
+### Project Structure
 ```
 aws-databricks-realtime-stock-streaming/
 │
@@ -181,6 +196,7 @@ aws-databricks-realtime-stock-streaming/
 │   ├── quicksight_dashboard.png
 │   ├── table_schema.png
 │
+├── LICENSE
 └── README.md
 ```
 
