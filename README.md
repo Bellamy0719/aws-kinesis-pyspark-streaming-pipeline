@@ -97,21 +97,41 @@ Acts as the real-time processing engine to continuously consumes the Kinesis str
 ### Step. 3 Display — Real-Time Visualization in Databricks
 Purpose:
 Provides live dashboards of streaming data using the built-in display() function, allowing real-time monitoring of:
-Latest close price per ticker (latest_close_df)
-1-minute rolling average trend (avg_1min_df)
-Located in: [notebooks/producer_kinesis.py](notebooks/databricks_streaming_consumer.ipynb)
-```
-raw_stream_df = (
-    spark.readStream
-        .format("kinesis")
-        .option("streamName", "stock_stream")
-        .option("region", "us-east-1")
-        .load()
-)
-```
+
+1. Latest close price per ticker (latest_close_df)
+
+![notebooks/consumer_kinesis.py](notebooks/databrick_consumer_lastest_close.png)
+
+2. 1-minute rolling average trend (avg_1min_df)
+ 
+![notebooks/consumer_kinesis.py](notebooks/databrick_consumer_avg_1min.png)
+
 Summary:
 Real-time visualization directly inside Databricks to confirm the streaming job is active and data is updating continuously.
 
+### Step. 4 Streaming Sink — Write to AWS S3 (Parquet + Checkpoints)
+Purpose:
+Writes processed streaming results to S3 in Parquet format, partitioned by ticker and trade_date,
+with checkpointing for exactly-once recovery.
+
+```
+(
+    avg_1min_df
+        .writeStream
+        .format("parquet")
+        .option("path", s3_output_path)
+        .option("checkpointLocation", checkpoint_path)
+        .outputMode("append")
+        .partitionBy("ticker", "trade_date")
+        .trigger(processingTime="1 minute")
+        .start()
+)
+
+```
+![notebooks/producer_kinesis.py](notebooks/databrick_consumer_writeto_s3.png)
+
+Summary:
+Streams results to AWS S3 for downstream analytics for fault-tolerant and partitioned for Athena/QuickSight queries.
 
 
 
