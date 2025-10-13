@@ -81,6 +81,7 @@ Purpose:
 Reads data from Kinesis in real time, parses JSON records, converts timestamps, and computes key metrics:
 1. Latest Close Price
 2. 1-min Rolling Average
+Located in: [notebooks/consumer_kinesis.py](notebooks/databricks_streaming_consumer.ipynb)
 ```
 raw_stream_df = (
     spark.readStream
@@ -93,7 +94,23 @@ raw_stream_df = (
 Summary:
 Acts as the real-time processing engine to continuously consumes the Kinesis stream and performs live transformations.
 
-
+### Step. 3 Display — Real-Time Visualization in Databricks
+Purpose:
+Provides live dashboards of streaming data using the built-in display() function, allowing real-time monitoring of:
+Latest close price per ticker (latest_close_df)
+1-minute rolling average trend (avg_1min_df)
+Located in: [notebooks/producer_kinesis.py](notebooks/databricks_streaming_consumer.ipynb)
+```
+raw_stream_df = (
+    spark.readStream
+        .format("kinesis")
+        .option("streamName", "stock_stream")
+        .option("region", "us-east-1")
+        .load()
+)
+```
+Summary:
+Real-time visualization directly inside Databricks to confirm the streaming job is active and data is updating continuously.
 
 
 
