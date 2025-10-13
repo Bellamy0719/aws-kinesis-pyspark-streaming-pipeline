@@ -128,7 +128,7 @@ with checkpointing for exactly-once recovery.
 )
 
 ```
-
+![notebooks/consumer_kinesis.py](databrick_consumer_writeto_s3.png)
 Summary:
 Streams results to AWS S3 for downstream analytics for fault-tolerant and partitioned for Athena/QuickSight queries.
 
