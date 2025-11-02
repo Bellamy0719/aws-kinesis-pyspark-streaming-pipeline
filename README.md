@@ -3,14 +3,14 @@
 ### >  This project extends the batch data lakehouse pipeline:
 > [aws-pyspark-data-lakehouse-pipeline](https://github.com/Bellamy0719/aws-pyspark-data-lakehouse-pipeline)
 
-### 🧠 Project Overview
+### Project Overview
 
 This project simulates real-time stock price streaming using AWS and Databricks.
 It reads 2024 historical data from S3, sends it to Kinesis as a live data feed,
 processes it in Databricks Structured Streaming, computes rolling metrics,
 and stores aggregated results back into S3 for downstream analytics(Glue, Athena, Quicksight)
 
-### ✅ Key Highlights
+### Key Highlights
 
 Real-time streaming with AWS Kinesis
 Processing with Databricks Structured Streaming (PySpark)
@@ -160,11 +160,11 @@ Final presentation layer to enable SQL-based exploration and rich visual dashboa
 ### Summary
 | Step | Component       | Description                                                 |
 | ---- | --------------- | ----------------------------------------------------------- |
-| 1️⃣  | Producer        | Sends historical data → Kinesis (simulated real-time feed)  |
-| 2️⃣  | Consumer        | Reads & processes stream in Databricks Structured Streaming |
-| 3️⃣  | Display         | Visualizes live metrics directly in Databricks              |
-| 4️⃣  | Streaming Sink  | Writes processed data to S3 (Parquet + checkpoints)         |
-| 5️⃣  | Analytics Layer | Queries results via Athena, visualizes in QuickSight        |
+|  1️   | Producer        | Sends historical data → Kinesis (simulated real-time feed)  |
+|  2️   | Consumer        | Reads & processes stream in Databricks Structured Streaming |
+|  3️   | Display         | Visualizes live metrics directly in Databricks              |
+|  4️   | Streaming Sink  | Writes processed data to S3 (Parquet + checkpoints)         |
+|  5️   | Analytics Layer | Queries results via Athena, visualizes in QuickSight        |
 
 ### Why These Tools
 AWS Kinesis — provides a fully managed, scalable real-time data stream, perfect for simulating live stock market data.
